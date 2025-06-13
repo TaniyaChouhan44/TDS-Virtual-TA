@@ -3,7 +3,7 @@ import json
 import sqlite3
 import numpy as np
 import re
-from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Body
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -742,36 +742,14 @@ async def health_check():
             content={"status": "unhealthy", "error": str(e), "api_key_set": bool(API_KEY)}
         )
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root():
-    return """
-    <html>
-        <head>
-            <title>TDS Virtual Teaching Assistant</title>
-            <style>
-                body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 40px; }
-                h1 { color: #2c3e50; }
-                p { font-size: 16px; }
-                code { background-color: #eee; padding: 2px 4px; border-radius: 4px; }
-                .container { max-width: 800px; margin: auto; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>👩‍🏫 TDS Virtual Teaching Assistant</h1>
-                <p>Welcome! This is an API-based teaching assistant for the <strong>Tools in Data Science</strong> course (Jan 2025).</p>
-                <p>Use the <code>/api/</code> endpoint to ask a question via POST request.</p>
+@app.post("/")
+async def root_post(request: Request):
+    try:
+        data = await request.json()
+        return JSONResponse(content={"message": "API is working", "received": data})
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
 
-                <h3>Sample usage (cURL):</h3>
-                <pre><code>curl -X POST http://127.0.0.1:8000/api/ \\
-  -H "Content-Type: application/json" \\
-  -d '{"question": "What is GPT-4?", "image": null}'</code></pre>
-
-                <p>You can also explore the API through the <a href="/docs">interactive Swagger UI</a>.</p>
-            </div>
-        </body>
-    </html>
-    """
 
 
 if __name__ == "__main__":
