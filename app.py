@@ -742,17 +742,16 @@ async def health_check():
             content={"status": "unhealthy", "error": str(e), "api_key_set": bool(API_KEY)}
         )
 
+
 @app.post("/")
 async def root(request: Request):
     try:
         data = await request.json()
         question = data.get("question", "")
-        answer = f"You asked: {question}"
-
-        return {"answer": answer}
-
+        return {"answer": f"You asked: {question}"}
     except Exception as e:
         return JSONResponse(status_code=400, content={"error": str(e)})
+
 
 
 if __name__ == "__main__":
