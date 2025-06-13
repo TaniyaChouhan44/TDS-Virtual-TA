@@ -743,13 +743,16 @@ async def health_check():
         )
 
 @app.post("/")
-async def root_post(request: Request):
+async def root(request: Request):
     try:
         data = await request.json()
-        return JSONResponse(content={"message": "API is working", "received": data})
+        question = data.get("question", "")
+        answer = f"You asked: {question}"
+
+        return {"answer": answer}
+
     except Exception as e:
         return JSONResponse(status_code=400, content={"error": str(e)})
-
 
 
 if __name__ == "__main__":
